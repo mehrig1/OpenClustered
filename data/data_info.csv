@@ -1,0 +1,20 @@
+,dataset_name,outcome,domain,sim_or_real,origin
+dat1_info,hospital,remission,medicine,simulated,GitHub package bimm and https://stats.oarc.ucla.edu/r/codefragments/mesimulation/
+dat2_info,ohio,resp,medicine,real,R package geepack and Fitzmaurice and Laird 1993 Biometrika paper
+dat3_info,election,bush,politics,real,Gelman 2006 book and http://www.stat.columbia.edu/~gelman/arm/examples/election88/
+dat4_info,language,pronoun,linguistics,real,MCMCglmm package tutorial and https://github.com/tmalsburg/MCMCglmm-intro/blob/master/README.org
+dat5_info,irishenglish,SUFlike,linguistics,real,https://ladal.edu.au/regression.html#Mixed-Effects_Binomial_Logistic_Regression
+dat6_info,tapping,tapped,linguistics,real,Kilbourn-Ceron (2017) and https://people.linguistics.mcgill.ca/~morgan/qmld-book/
+dat7_info,alternatives,prominence,linguistics,real,Wagner (2016) and https://people.linguistics.mcgill.ca/~morgan/qmld-book/
+dat8_info,givenness,stressshift,linguistics,real,Wagner (2012) and https://people.linguistics.mcgill.ca/~morgan/qmld-book/
+dat9_info,contraception,use,medicine,real,Bates (2014) and https://cran.r-project.org/web/packages/hmclearn/vignettes/logistic_mixed_effects_hmclearn.html
+dat10_info,prenatal,care,medicine,real,Rodriguez (1995) and https://cran.r-project.org/web/packages/mlmRev/mlmRev.pdf
+dat11_info,memory,acc,education,real,James (2020) and https://emljames.github.io/YSJ_R_workshop/regression-models.html
+dat12_info,dative,Verb,linguistics,real,Bresnan (2007) and https://bookdown.org/animestina/phd_july_19/now-over-to-you.html
+dat13_info,culcita,predation,ocean,real,McKeon (2012) and https://ms.mcmaster.ca/~bolker/R/misc/foxchapter/bolker_chap.html
+dat14_info,toenail,outcome,medicine,real,https://github.dev/bbolker/asaglmm/
+dat15_info,bacteria,y,medicine,real,R package MASS
+dat16_info,bovine,diseased,animal,real,R package glmm and Lesnoff 2004
+dat17_info,salamander,mate,animal,real,"R package glmm and McCullagh P. and Nelder, J. A. (1989)"
+dat18_info,glmmEPsimdata,y,NA,simulated,R package glmmEP
+dat19_info,mbestsimdata,y,NA,simulated,R package mbest

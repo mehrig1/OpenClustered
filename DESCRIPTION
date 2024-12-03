@@ -1,0 +1,5 @@
+Package: openCluster
+Type: Package
+Title: R package for clustered and longitudinal data 
+Version: 0.0.1.0
+RoxygenNote: 7.3.2
