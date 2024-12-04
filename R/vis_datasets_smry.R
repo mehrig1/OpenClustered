@@ -7,6 +7,7 @@
 #' meta_data = get_data("meta_data")
 #' vis_datasets_smry(meta_data)
 #' @export
+#' 
 vis_datasets_smry <- function(df){
   
   #Create plot for Coef of Variation
