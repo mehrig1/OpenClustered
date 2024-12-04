@@ -8,6 +8,6 @@ Depends:
 LazyData: true
 Encoding: UTF-8
 Imports: 
-  ggplot2
+  ggplot2,
   dplyr
   
