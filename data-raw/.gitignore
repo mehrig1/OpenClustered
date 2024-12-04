@@ -20,3 +20,5 @@ dat13.csv
 dat12.csv
 dat11.csv
 dat10.csv
+summarize_datasets.R
+.gitignore
