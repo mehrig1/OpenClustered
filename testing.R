@@ -4,7 +4,7 @@ library(OpenClustered)
 
 vis_datasets_smry()
 
-
+OpenClustered::
 
 datasets$meta_data %>% filter(n_features>5) %>% select(dataset)
 
