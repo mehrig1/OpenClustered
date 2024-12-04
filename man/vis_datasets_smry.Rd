@@ -17,5 +17,5 @@ Creates a 4-panel figure of summary statistics of the dataset meta data, summari
 }
 \examples{
 meta_data = get_data("meta_data")
-vis_datasets_smry(meta_data);
+vis_datasets_smry(meta_data)
 }
