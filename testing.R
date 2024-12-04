@@ -9,12 +9,7 @@ datasets[test]
 
 names(datasets)
 
-filter_data <- function(...) {
-  datasets$meta_data %>%
-    filter(...) %>%
-    select(dataset) %>%
-    unlist()
-    
-}
-
 filter_data(n_features>10, n_obs>2500)
+
+library(roxygen2) # Read in the roxygen2 R package
+roxygenise()

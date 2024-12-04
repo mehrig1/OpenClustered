@@ -9,5 +9,5 @@ LazyData: true
 Encoding: UTF-8
 Depends: 
   tidyverse,
-  gridExtra
+  gridExtra;
   
