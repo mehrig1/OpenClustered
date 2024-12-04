@@ -2,8 +2,7 @@ library(usethis)
 library(here)
 
 files = list.files("data-raw/")
-files = files[grepl("info|meta|load", files)==F] #get rid of info file
-file_names = gsub(".csv", "", files)
+files = files[grepl("load", files)==F] #get rid of info filefile_names = gsub(".csv", "", files)
 
 for(i in 1:length(files)){
   temp =  read.csv(paste("data-raw/", files[i], sep=""))
