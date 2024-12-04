@@ -8,8 +8,7 @@
 #' vis_datasets_smry(meta_data)
 #' @export
 #' 
-vis_datasets_smry <- function(df){
-  
+vis_datasets_smry <- function(df = datasets$data_meta){
   #Create plot for Coef of Variation
   p2 <- ggplot(df, (aes(x = n_features))) +
     geom_histogram(binwidth = 1,
