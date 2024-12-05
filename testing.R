@@ -1,17 +1,19 @@
 #devtools::install_github("https://github.com/NateOConnellPhD/OpenClustered")
 
+#Install package
 devtools::install()
 library(OpenClustered)
-vis_datasets_smry()
 
+#Testing functions
 x <- filter_data(n_features>10, n_obs>2500, subset=T)
-x
+
+plot_meta_data(allplots=F)
 
 
 library(roxygen2); # Read in the roxygen2 R package
 roxygenise();      # Builds the help files
 
-#Create file for meta data descriptin
-usethis::use_r("meta_data")
-usethis::use_r("data_list")
+## Create file for meta data description
+# usethis::use_r("meta_data")
+# usethis::use_r("data_list")
 

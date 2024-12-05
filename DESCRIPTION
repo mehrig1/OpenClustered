@@ -6,7 +6,7 @@ Authors@R:
            family = "O'Connell",
            role = c("aut", "cre"),
            email = "n.oconnell@wakehealth.edu")
-Version: 0.0.2.0
+Version: 1.0
 RoxygenNote: 7.3.2
 Depends: R (>= 2.10), tidyverse, gridExtra
 LazyData: true
