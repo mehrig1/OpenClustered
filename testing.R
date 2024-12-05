@@ -1,8 +1,9 @@
-#devtools::install_github("https://github.com/NateOConnellPhD/OpenClustered")
+devtools::install_github("https://github.com/NateOConnellPhD/OpenClustered")
 
-#library(OpenClustered)
+library(OpenClustered)
 
 devtools::install()
+
 vis_datasets_smry()
 
 filter_data(n_features>10, n_obs>2500)
