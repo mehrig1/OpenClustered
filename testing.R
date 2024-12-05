@@ -1,15 +1,13 @@
-devtools::install_github("https://github.com/NateOConnellPhD/OpenClustered")
+#devtools::install_github("https://github.com/NateOConnellPhD/OpenClustered")
 
-library(OpenClustered)
+#library(OpenClustered)
 
+devtools::install()
 vis_datasets_smry()
-
-unlist(datasets$meta_data %>% filter(n_features>5) %>% select(dataset))
-datasets[test]
-
-names(datasets)
 
 filter_data(n_features>10, n_obs>2500)
 
-library(roxygen2) # Read in the roxygen2 R package
-roxygenise()
+
+library(roxygen2); # Read in the roxygen2 R package
+roxygenise();      # Builds the help files
+
