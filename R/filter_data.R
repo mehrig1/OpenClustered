@@ -8,7 +8,7 @@
 #' @export
 #' 
 filter_data <- function(...) {
-  datasets$meta_data %>%
+  data_list$meta_data %>%
     filter(...) %>%
     select(dataset) %>%
     unlist()
