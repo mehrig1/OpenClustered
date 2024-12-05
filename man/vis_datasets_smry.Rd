@@ -4,7 +4,7 @@
 \alias{vis_datasets_smry}
 \title{Visualize summary characteristics of all available datasets}
 \usage{
-vis_datasets_smry(df)
+vis_datasets_smry(df = datasets$meta_data)
 }
 \arguments{
 \item{df}{the meta data file one returned from get_data("meta_data.csv");}

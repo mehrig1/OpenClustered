@@ -3,11 +3,6 @@ Type: Package
 Title: R package for clustered and longitudinal data 
 Version: 0.0.1.0
 RoxygenNote: 7.3.2
-Depends: 
-    R (>= 2.10)
+Depends: R (>= 2.10), tidyverse, gridExtra
 LazyData: true
 Encoding: UTF-8
-Depends: 
-  tidyverse,
-  gridExtra;
-  
