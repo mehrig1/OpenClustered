@@ -50,6 +50,7 @@ relevel_to_other <- function(factor_var, threshold) {
 }
 
 ling_data$dat12$cluster_id <- relevel_to_other(as.factor(ling_data$dat12$cluster_id), threshold = 30)
+table(ling_data$dat12$cluster_id)
 
 # Split Dataset by single split into training and testing datasets
 train_ids <- sample(1:nrow(ling_data$dat12), size = round(.7 * nrow(ling_data$dat12)))

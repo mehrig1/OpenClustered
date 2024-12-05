@@ -8,7 +8,9 @@ always_allow_html: true
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-OpenClustered is an R package data repository for clustered and longitudinal datasets. The goal of this package is to coalesce clustered datasets in harmonized fashioned for developing, testing, and benchmarking existing and new methods for clustered data analysis and prediction. Currently, there are 19 datasets in this repository loaded in with the list "data_list". Each dataset has a unique set of predictor variables/features, with the outcome commonly renamed to "taget" and the cluster variable to "cluster_id". The dataset "meta_data" contains information on each of these data sets. Current functionality of this package is basic - limited to reading in, summarizing, and subsetting datasets based on user defined filtering criteria. The development of this R package is ongoing, as we will continue to add more clustered data sets they become available and can be harmonized. We will continue to add more functionality to this package based on user feedback/requests. 
+OpenClustered is an R package data repository for clustered and longitudinal datasets. The goal of this package is to coalesce clustered datasets in harmonized fashioned for developing, testing, and benchmarking existing and new methods for clustered data analysis and prediction. Currently, there are 19 datasets in this repository loaded in with the list "data_list". Each dataset has a unique set of predictor variables/features, with the outcome commonly renamed to "target" and the cluster variable to "cluster_id". The dataset "meta_data" contains information on each of these data sets. Current functionality of this package is basic - limited to reading in, summarizing, and subsetting datasets based on user defined filtering criteria. The development of this R package is ongoing, as we will continue to add more clustered data sets they become available and can be harmonized. We will continue to add more functionality to this package based on user feedback/requests. 
+
+**If you have a clustered dataset without protected information that you can make publicly available, please reach out and we would be happy to incorporate it into this package**
 
 Here is a simple tutorial for using this package: 
 
@@ -70,7 +72,7 @@ ling_data = filter_data(n_obs >=1000, domain=="linguistics", subset=T)
 
 We can then plot the meta data characteristics as we did before, but specifically for this subset data using the "plot_meta_data()" function and specifying the 'df' parameter to be the new subset list. Note, the 'df' parameter in 'plot_meta_data()' can be either a list or the vector of dataset names given by 'filter_data()':
 
-```{r filter_summary}
+```{r filter_summary, message=F}
 # view characteristics of new data
 plot_meta_data(allplots=T, df = ling_data)
 ```
@@ -102,32 +104,6 @@ table1::table1(~Modality + SemanticClass + LengthOfRecipient +
                  DefinOfTheme+PronomOfTheme+AccessOfRec+AccessOfTheme, data=ling_data$dat12)
 ```
 
-### Assessment of cluster ID variable
-
-```{r cluster_assess}
-# Assess the cluster Variable
-table(ling_data$dat12$cluster_id)
-```
-
-We see numerous clusters with small counts. This will give us issues when fitting training and testing datasets using a GLMM. Next we write a simple function to convert all clusters with fewer than 30 counts into an "other" category:
-
-```{r cluster_reduce}
-# relevel all clusters levels with less than `threshold' observations into their own category
-relevel_to_other <- function(factor_var, threshold) {
-  # Get frequency counts for each level
-  level_counts <- table(factor_var)
-  
-  # Identify levels to be grouped into "other"
-  levels_to_other <- names(level_counts[level_counts < threshold])
-  
-  # rename variables in levels_to_other to "other"
-  factor_var = ifelse(factor_var %in% levels_to_other, "other", as.character(factor_var))
-  return(factor_var)
-}
-
-ling_data$dat12$cluster_id <- relevel_to_other(as.factor(ling_data$dat12$cluster_id), threshold = 30)
-```
-
 We then split the dataset into training and testing datasets with a 70:30 split:
 
 ```{r split_data}
@@ -156,9 +132,15 @@ And lastly we predict over the test dataset and assess the AUC using the `pROC' 
 
 ```{r auc_assess, message=F}
 # Predict 
-test_data$predicted_prob <- predict(fit, newdata = test_data, type = "response")
+test_data$predicted_prob <- test_data$predicted_prob <- predict(fit, newdata = test_data, type = "response",
+                                    allow.new.levels=T)
 
 # Compute AUC
 auc_result <- pROC::roc(response =test_data$target, predictor = test_data$predicted_prob)
+```
+
+Which returns: 
+
+```{r auc_out}
 auc_result
 ```
