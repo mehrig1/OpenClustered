@@ -15,12 +15,13 @@ filter_data <- function(..., subset=T) {
                       select(dataset) %>%
                       unlist()
   
+  names(subset_names) = subset_names
+  
   if(subset==T){
     return(OpenClustered::data_list[subset_names])
   } else {
     return(subset_names)
   }
-  
 }
 
 

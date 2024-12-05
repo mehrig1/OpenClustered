@@ -4,12 +4,12 @@
 \alias{plot_meta_data}
 \title{Provides plot of meta data for all datasets in the 'data_list'}
 \usage{
-plot_meta_data(allplots = T, df = OpenClustered::meta_data)
+plot_meta_data(allplots = T, df = OpenClustered::data_list)
 }
 \arguments{
 \item{allplots}{Logical (T or F); If T, returns a 4-panel grid of each plot. If F, returns a list of each of the 4 plots as an individual element}
 
-\item{df}{the meta data file one returned from get_data("meta_data.csv");}
+\item{df}{A list of data frames or vector of data frame names from the data-list.}
 }
 \value{
 4-panel figure of metadata summary

@@ -8,6 +8,6 @@ Authors@R:
            email = "n.oconnell@wakehealth.edu")
 Version: 1.0
 RoxygenNote: 7.3.2
-Depends: R (>= 2.10), tidyverse, gridExtra
+Depends: R (>= 2.10), tidyverse, gridExtra, table1
 LazyData: true
 Encoding: UTF-8

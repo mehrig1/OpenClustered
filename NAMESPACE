@@ -2,3 +2,4 @@
 
 export(filter_data)
 export(plot_meta_data)
+export(tab_meta_data)
