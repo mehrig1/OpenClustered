@@ -7,8 +7,8 @@ datasets in harmonized fashioned for developing, testing, and
 benchmarking existing and new methods for clustered data analysis and
 prediction. Currently, there are 19 datasets in this repository loaded
 in with the list “data_list”. Each dataset has a unique set of predictor
-variables/features, with the outcome commonly renamed to “taget” and the
-cluster variable to “cluster_id”. The dataset “meta_data” contains
+variables/features, with the outcome commonly renamed to “target” and
+the cluster variable to “cluster_id”. The dataset “meta_data” contains
 information on each of these data sets. Current functionality of this
 package is basic - limited to reading in, summarizing, and subsetting
 datasets based on user defined filtering criteria. The development of
@@ -16,6 +16,10 @@ this R package is ongoing, as we will continue to add more clustered
 data sets they become available and can be harmonized. We will continue
 to add more functionality to this package based on user
 feedback/requests.
+
+**If you have a clustered dataset without protected information that you
+can make publicly available, please reach out and we would be happy to
+incorporate it into this package**
 
 Here is a simple tutorial for using this package:
 
@@ -238,11 +242,6 @@ of dataset names given by ‘filter_data()’:
 # view characteristics of new data
 plot_meta_data(allplots=T, df = ling_data)
 ```
-
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 
 ![](README_files/figure-gfm/filter_summary-1.png)<!-- -->
 
@@ -542,57 +541,6 @@ table1::table1(~Modality + SemanticClass + LengthOfRecipient +
 </table>
 </div>
 
-### Assessment of cluster ID variable
-
-``` r
-# Assess the cluster Variable
-table(ling_data$dat12$cluster_id)
-```
-
-    ## 
-    ##    accord    afford  allocate     allot     allow    assess    assign    assure 
-    ##         1         1         3         3        13         1         4         2 
-    ##     award  bequeath       bet     bring     carry     cause      cede    charge 
-    ##        19         1         2        55         1        10         2        43 
-    ##      cost      deal   deliver      deny        do    extend      feed      fine 
-    ##       169         2         3        12        31         4        17         2 
-    ##      flip     float    funnel       get      give     grant guarantee      hand 
-    ##         1         1         1         1      1666        13         2        15 
-    ## hand_over     issue     lease     leave      lend      loan      mail      make 
-    ##         1         6         4        11        20        21        14         6 
-    ##       net     offer       owe       pay  pay_back    permit    prepay   present 
-    ##         1        79        31       207         1         2         1         1 
-    ##   promise     quote      read    refuse reimburse     repay    resell       run 
-    ##        10         2         8         1         1         1         3         1 
-    ##      sell sell_back  sell_off      send     serve      show      slip    submit 
-    ##       206         1         1       172         7        58         1         1 
-    ##    supply      swap      take     teach      tell    tender     trade      vote 
-    ##         1         1        58        64       128         1         1         1 
-    ##      will      wish     write 
-    ##         1         9        17
-
-We see numerous clusters with small counts. This will give us issues
-when fitting training and testing datasets using a GLMM. Next we write a
-simple function to convert all clusters with fewer than 30 counts into
-an “other” category:
-
-``` r
-# relevel all clusters levels with less than `threshold' observations into their own category
-relevel_to_other <- function(factor_var, threshold) {
-  # Get frequency counts for each level
-  level_counts <- table(factor_var)
-  
-  # Identify levels to be grouped into "other"
-  levels_to_other <- names(level_counts[level_counts < threshold])
-  
-  # rename variables in levels_to_other to "other"
-  factor_var = ifelse(factor_var %in% levels_to_other, "other", as.character(factor_var))
-  return(factor_var)
-}
-
-ling_data$dat12$cluster_id <- relevel_to_other(as.factor(ling_data$dat12$cluster_id), threshold = 30)
-```
-
 We then split the dataset into training and testing datasets with a
 70:30 split:
 
@@ -616,7 +564,7 @@ fit = glmer(target == "PP" ~ Modality + SemanticClass + LengthOfRecipient +
 ```
 
     ## Warning in checkConv(attr(opt, "derivs"), opt$par, ctrl = control$checkConv, :
-    ## Model failed to converge with max|grad| = 0.00700836 (tol = 0.002, component 1)
+    ## Model failed to converge with max|grad| = 0.0226843 (tol = 0.002, component 1)
 
 ``` r
 # Summarize Mixed Model
@@ -633,37 +581,37 @@ summary(fit)
     ##    Data: train_data
     ## 
     ##      AIC      BIC   logLik deviance df.resid 
-    ##   1124.0   1232.9   -543.0   1086.0     2265 
+    ##   1116.0   1224.9   -539.0   1078.0     2265 
     ## 
     ## Scaled residuals: 
     ##     Min      1Q  Median      3Q     Max 
-    ## -4.6152 -0.2191 -0.0921  0.0261 14.3102 
+    ## -5.0085 -0.2041 -0.0866  0.0220 14.1470 
     ## 
     ## Random effects:
     ##  Groups     Name        Variance Std.Dev.
-    ##  cluster_id (Intercept) 3.973    1.993   
-    ## Number of obs: 2284, groups:  cluster_id, 15
+    ##  cluster_id (Intercept) 3.503    1.872   
+    ## Number of obs: 2284, groups:  cluster_id, 64
     ## 
     ## Fixed effects:
     ##                         Estimate Std. Error z value Pr(>|z|)    
-    ## (Intercept)              1.28214    0.87405   1.467 0.142406    
-    ## Modalitywritten         -0.01504    0.23272  -0.065 0.948474    
-    ## SemanticClassc           0.39657    0.39548   1.003 0.315973    
-    ## SemanticClassf          -0.28730    0.61095  -0.470 0.638176    
-    ## SemanticClassp          -2.58196    1.14129  -2.262 0.023678 *  
-    ## SemanticClasst           0.21718    0.23464   0.926 0.354649    
-    ## LengthOfRecipient        0.27988    0.05180   5.404 6.53e-08 ***
-    ## AnimacyOfRecinanimate    2.06127    0.29811   6.914 4.70e-12 ***
-    ## DefinOfRecindefinite     0.79465    0.23535   3.376 0.000734 ***
-    ## PronomOfRecpronominal   -1.92949    0.26347  -7.323 2.42e-13 ***
-    ## LengthOfTheme           -0.22020    0.03034  -7.258 3.92e-13 ***
-    ## AnimacyOfThemeinanimate -1.26939    0.57454  -2.209 0.027147 *  
-    ## DefinOfThemeindefinite  -1.00578    0.21648  -4.646 3.38e-06 ***
-    ## PronomOfThemepronominal  2.07952    0.29192   7.124 1.05e-12 ***
-    ## AccessOfRecgiven        -0.89184    0.25057  -3.559 0.000372 ***
-    ## AccessOfRecnew           0.51453    0.27542   1.868 0.061743 .  
-    ## AccessOfThemegiven       1.49764    0.30475   4.914 8.91e-07 ***
-    ## AccessOfThemenew        -0.29133    0.21875  -1.332 0.182922    
+    ## (Intercept)              2.25109    0.76820   2.930  0.00339 ** 
+    ## Modalitywritten          0.07323    0.24396   0.300  0.76403    
+    ## SemanticClassc           0.25905    0.40679   0.637  0.52425    
+    ## SemanticClassf           0.02539    0.69753   0.036  0.97096    
+    ## SemanticClassp          -3.83339    1.43815  -2.665  0.00769 ** 
+    ## SemanticClasst           0.13517    0.25288   0.535  0.59296    
+    ## LengthOfRecipient        0.29068    0.05350   5.433 5.54e-08 ***
+    ## AnimacyOfRecinanimate    2.13401    0.30629   6.967 3.23e-12 ***
+    ## DefinOfRecindefinite     0.78927    0.24259   3.253  0.00114 ** 
+    ## PronomOfRecpronominal   -1.91310    0.27080  -7.065 1.61e-12 ***
+    ## LengthOfTheme           -0.22282    0.03122  -7.138 9.47e-13 ***
+    ## AnimacyOfThemeinanimate -1.37084    0.59341  -2.310  0.02088 *  
+    ## DefinOfThemeindefinite  -1.02552    0.22581  -4.541 5.59e-06 ***
+    ## PronomOfThemepronominal  2.19914    0.30204   7.281 3.31e-13 ***
+    ## AccessOfRecgiven        -1.01182    0.25989  -3.893 9.89e-05 ***
+    ## AccessOfRecnew           0.51658    0.28871   1.789  0.07357 .  
+    ## AccessOfThemegiven       1.49852    0.31372   4.777 1.78e-06 ***
+    ## AccessOfThemenew        -0.32767    0.22954  -1.428  0.15343    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -673,17 +621,23 @@ summary(fit)
     ##     vcov(x)        if you need it
 
     ## optimizer (Nelder_Mead) convergence code: 0 (OK)
-    ## Model failed to converge with max|grad| = 0.00700836 (tol = 0.002, component 1)
+    ## Model failed to converge with max|grad| = 0.0226843 (tol = 0.002, component 1)
 
 And lastly we predict over the test dataset and assess the AUC using the
 \`pROC’ package:
 
 ``` r
 # Predict 
-test_data$predicted_prob <- predict(fit, newdata = test_data, type = "response")
+test_data$predicted_prob <- test_data$predicted_prob <- predict(fit, newdata = test_data, type = "response",
+                                    allow.new.levels=T)
 
 # Compute AUC
 auc_result <- pROC::roc(response =test_data$target, predictor = test_data$predicted_prob)
+```
+
+Which returns:
+
+``` r
 auc_result
 ```
 
@@ -692,4 +646,4 @@ auc_result
     ## roc.default(response = test_data$target, predictor = test_data$predicted_prob)
     ## 
     ## Data: test_data$predicted_prob in 739 controls (test_data$target NP) < 240 cases (test_data$target PP).
-    ## Area under the curve: 0.9657
+    ## Area under the curve: 0.9674
