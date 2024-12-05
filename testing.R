@@ -7,7 +7,7 @@ library(OpenClustered)
 #Testing functions
 x <- filter_data(n_features>10, n_obs>2500, subset=T)
 
-plot_meta_data(allplots=F)
+plot_meta_data(allplots=T)
 
 
 library(roxygen2); # Read in the roxygen2 R package
