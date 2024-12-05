@@ -1,0 +1,164 @@
+---
+title: "OpenClustered"
+output: github_document
+always_allow_html: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+OpenClustered is an R package data repository for clustered and longitudinal datasets. The goal of this package is to coalesce clustered datasets in harmonized fashioned for developing, testing, and benchmarking existing and new methods for clustered data analysis and prediction. Currently, there are 19 datasets in this repository loaded in with the list "data_list". Each dataset has a unique set of predictor variables/features, with the outcome commonly renamed to "taget" and the cluster variable to "cluster_id". The dataset "meta_data" contains information on each of these data sets. Current functionality of this package is basic - limited to reading in, summarizing, and subsetting datasets based on user defined filtering criteria. The development of this R package is ongoing, as we will continue to add more clustered data sets they become available and can be harmonized. We will continue to add more functionality to this package based on user feedback/requests. 
+
+Here is a simple tutorial for using this package: 
+
+## Install package from github
+
+```{r install, results='hide', warning=F, message=FALSE}
+# Install package from github
+devtools::install_github("https://github.com/NateOConnellPhD/OpenClustered")
+
+# load package
+library(OpenClustered)
+```
+
+Currently, the package has the following packages as dependecies: tidyverse, gridExtra, and table1. 
+
+## View Meta Data and Info of available datasets
+
+We can view info and meta data on the availble datasets within the list 'data_list' by viewing 'meta_data':
+
+```{r view_data}
+# View Meta Data files
+# exclude the 6th column 'origin' for cleaner output
+head(OpenClustered::meta_data)[,-6]
+```
+
+### Plot Meta Data
+
+We can further visually assess characteristics of the datasets with the 'plot_meta_data()' function. This function by default returns characteristic plots for *all* included datasets in 'data_list'. The parameter 'allplots' is logical; if T, it returns a 2x2 grid of plots characterizing the number of observations, features, clustering units, and imbalance across datasets. If 'allplots=F', it returns a list with 4 elements containing each of these plots. 
+
+```{r plot_meta, message=F}
+# View meta data characteristics of all datasets in `data_list`
+plot_meta_data(allplots=T)
+```
+
+
+### Tabulate Meta Data
+
+We can further tabulate meta data summary statistics via the function 'tab_meta_data'. At it's core, this function is simply a wrapper for the 'table1::table1" function, but further allows for simple specification of a subset of datasets from data_list for summarization (to be shown in an upcoming section). By defualt, this function summarizes all datasets from "data_list", with the primary parameter 'formula' being a formula specification following the notation, '~ x + y + z`, where x, y, and z are variables to summarize.
+
+
+```{r tab_meta, message=F}
+# Summarize Meta Data (using r package "table1")
+tab_meta_data(formula = ~n_obs + n_features + n_clusters + imbalance + missing_obs + 
+                domain + sim_or_real)
+```
+
+## Subsetting data_list 
+
+We provide wrapper functons for easily subsetting the 'data_list' based on meta data criteria through the function 'filter_data()'. The primary inputs follow 'dplyr::filter()' syntax. The 'subset' parameter is logical. If "TRUE", it returns a list containing each dataset meeting the specified criteria as an element of that list. If "FALSE", the function returns a vector of the dataset names matching the filtered criteria. 
+
+Here's an example of us subsetting our 'data_list' to only those with >= 1000 observations within the domain "linguistics":
+
+```{r filter}
+# Subset data_list to datasets with >5000 observations and in the domain of 'linguistics'
+ling_data = filter_data(n_obs >=1000, domain=="linguistics", subset=T)
+```
+
+### Summary Plots of Linguistics data
+
+We can then plot the meta data characteristics as we did before, but specifically for this subset data using the "plot_meta_data()" function and specifying the 'df' parameter to be the new subset list. Note, the 'df' parameter in 'plot_meta_data()' can be either a list or the vector of dataset names given by 'filter_data()':
+
+```{r filter_summary}
+# view characteristics of new data
+plot_meta_data(allplots=T, df = ling_data)
+```
+
+### Tabulate Sumamry Statistics for Linguistics Data
+
+Similarly, we can tabulate these chacarteristics in the "tab_meta_data()" functuon through the 'df' parameter in the same way: 
+
+```{r filter_plots}
+# Summarize the list of linguistic datasets with >=1000 observations
+tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs + 
+                domain + sim_or_real, df= ling_data)
+```
+
+# Example 
+
+In this example, we will take one of the linguistics datasets above ("dat12" which can be called through the subset data list "ling_dat$dat12") and create a assess AUC performance of a predicton model using training and testing data and a GLMM with the package 'lme4'. Note, we exclude one variable 'Speaker' due to sparsity
+
+```{r ling_load, message=F, warning=F}
+### Develop a Logistic Prediction Model on one of the datasets (dat12) in Linguistics 
+### Load in necessary packages
+library(lme4)
+library(pROC)
+
+#Summarize ling_dat$dat12 using table1 package
+# Summarize dat12 using Table 1
+table1::table1(~Modality + SemanticClass + LengthOfRecipient + 
+                 AnimacyOfRec+ + DefinOfRec + PronomOfRec+LengthOfTheme+ AnimacyOfTheme+
+                 DefinOfTheme+PronomOfTheme+AccessOfRec+AccessOfTheme, data=ling_data$dat12)
+```
+
+### Assessment of cluster ID variable
+
+```{r cluster_assess}
+# Assess the cluster Variable
+table(ling_data$dat12$cluster_id)
+```
+
+We see numerous clusters with small counts. This will give us issues when fitting training and testing datasets using a GLMM. Next we write a simple function to convert all clusters with fewer than 30 counts into an "other" category:
+
+```{r cluster_reduce}
+# relevel all clusters levels with less than `threshold' observations into their own category
+relevel_to_other <- function(factor_var, threshold) {
+  # Get frequency counts for each level
+  level_counts <- table(factor_var)
+  
+  # Identify levels to be grouped into "other"
+  levels_to_other <- names(level_counts[level_counts < threshold])
+  
+  # rename variables in levels_to_other to "other"
+  factor_var = ifelse(factor_var %in% levels_to_other, "other", as.character(factor_var))
+  return(factor_var)
+}
+
+ling_data$dat12$cluster_id <- relevel_to_other(as.factor(ling_data$dat12$cluster_id), threshold = 30)
+```
+
+We then split the dataset into training and testing datasets with a 70:30 split:
+
+```{r split_data}
+set.seed(123)
+
+# Split Dataset by single split into training and testing datasets
+train_ids <- sample(1:nrow(ling_data$dat12), size = round(.7 * nrow(ling_data$dat12)))
+train_data <- ling_data$dat12[train_ids, ]  # Training set
+test_data <- ling_data$dat12[-train_ids, ]  # Testing set
+```
+
+We then fit our mixed model:
+
+```{r fit_mixed}
+#Fit Mixed Model
+fit = glmer(target == "PP" ~ Modality + SemanticClass + LengthOfRecipient + 
+             AnimacyOfRec+ + DefinOfRec + PronomOfRec+LengthOfTheme+ AnimacyOfTheme+
+             DefinOfTheme+PronomOfTheme+AccessOfRec+AccessOfTheme+(1|cluster_id), data=train_data,
+            family=binomial(link="logit"))
+
+# Summarize Mixed Model
+summary(fit)
+```
+
+And lastly we predict over the test dataset and assess the AUC using the `pROC' package:
+
+```{r auc_assess, message=F}
+# Predict 
+test_data$predicted_prob <- predict(fit, newdata = test_data, type = "response")
+
+# Compute AUC
+auc_result <- pROC::roc(response =test_data$target, predictor = test_data$predicted_prob)
+auc_result
+```

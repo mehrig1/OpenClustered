@@ -27,7 +27,7 @@ tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs +
 ### Develop a Logistic Prediction Model on one of the datasets (dat12) in Linguistics 
 library(lme4)
 library(pROC)
-
+names(ling_data$dat12)
 # Summarize dat12 using Table 1
 table1::table1(~Modality + SemanticClass + LengthOfRecipient + 
                  AnimacyOfRec+ + DefinOfRec + PronomOfRec+LengthOfTheme+ AnimacyOfTheme+
