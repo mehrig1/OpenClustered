@@ -6,3 +6,4 @@ data-raw/
 testing.R
 Example.R
 benchmark_example/
+results.rds
