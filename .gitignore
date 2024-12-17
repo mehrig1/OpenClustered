@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 data-raw/ 
+<<<<<<< HEAD
 
 testing.R
 Example.R
@@ -10,3 +11,8 @@ benchmark_example/
 
 results.rds
 
+=======
+testing.R
+Example.R
+Benchmark_example.R
+>>>>>>> fec6732256bd861ae80dcb8d0ae5395640b8e973
