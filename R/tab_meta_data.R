@@ -1,4 +1,4 @@
-#' Provides a table of descriptive statistics for the meta data of the datasts provided
+#' Provides a table of descriptive statistics for the meta data of the datasets provided
 #'
 #' A wrapper function using the 'table1' package that provides summary data characteristics of a given list of data sets
 #' @param formula A formula specifying which meta data characteristics to summarize. In the form of "~ x + y + z +..."

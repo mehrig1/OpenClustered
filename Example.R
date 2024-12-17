@@ -33,24 +33,7 @@ table1::table1(~Modality + SemanticClass + LengthOfRecipient +
                  AnimacyOfRec+ + DefinOfRec + PronomOfRec+LengthOfTheme+ AnimacyOfTheme+
                  DefinOfTheme+PronomOfTheme+AccessOfRec+AccessOfTheme, data=ling_data$dat12)
 
-# Assess the cluster Variable
-table(ling_data$dat12$cluster_id)
 
-# relevel all clusters levels with less than `threshold' observations into their own category
-relevel_to_other <- function(factor_var, threshold) {
-  # Get frequency counts for each level
-  level_counts <- table(factor_var)
-  
-  # Identify levels to be grouped into "other"
-  levels_to_other <- names(level_counts[level_counts < threshold])
-  
-  # rename variables in levels_to_other to "other"
-  factor_var = ifelse(factor_var %in% levels_to_other, "other", as.character(factor_var))
-  return(factor_var)
-}
-
-ling_data$dat12$cluster_id <- relevel_to_other(as.factor(ling_data$dat12$cluster_id), threshold = 30)
-table(ling_data$dat12$cluster_id)
 
 # Split Dataset by single split into training and testing datasets
 train_ids <- sample(1:nrow(ling_data$dat12), size = round(.7 * nrow(ling_data$dat12)))
@@ -67,7 +50,8 @@ fit = glmer(target == "PP" ~ Modality + SemanticClass + LengthOfRecipient +
 summary(fit)
 
 # Predict 
-test_data$predicted_prob <- predict(fit, newdata = test_data, type = "response")
+test_data$predicted_prob <- predict(fit, newdata = test_data, type = "response",
+                                    allow.new.levels=T)
 
 # Compute AUC
 auc_result <- pROC::roc(response =test_data$target, predictor = test_data$predicted_prob)
