@@ -4,6 +4,9 @@ devtools::install_github("https://github.com/NateOConnellPhD/OpenClustered")
 # load package
 library(OpenClustered)
 
+OpenClustered::data_list[[3]]
+test = data_list
+
 # View Meta Data files
 head(OpenClustered::meta_data)
 
@@ -11,8 +14,16 @@ head(OpenClustered::meta_data)
 plot_meta_data(allplots=T)
 
 # Summarize Meta Data (using r package "table1")
-tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs + 
-                domain + sim_or_real)
+tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs )
+
+order_datasets <- function(dataset_names) {
+  # Extract numeric part after "dat" and order based on that
+  sorted_names <- dataset_names[order(as.numeric(sub("dat", "", dataset_names)))]
+  return(sorted_names)
+}
+names(meta_data)
+meta_data<- meta_data[order(as.numeric(sub("dat", "", meta_data[["dataset"]]))), ]
+meta_data[,c(1:6)]  %>% kableExtra::kbl() %>% kableExtra::kable_styling()
 
 # Subset data_list to datasets with >5000 observations and in the domain of 'linguistics'
 ling_data = filter_data(n_obs >=1000, domain=="linguistics", subset=T)

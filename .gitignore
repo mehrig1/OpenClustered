@@ -7,4 +7,5 @@ testing.R
 Example.R
 benchmark_example/
 results.rds
+auc_results.rds
 
