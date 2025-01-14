@@ -22,7 +22,7 @@ plot_meta_data <- function(allplots=T, df = OpenClustered::data_list){
     geom_histogram(color = "white",
                    fill = "black", boundary = 0) +
     ggtitle("Number of Observations") +
-    ylab("Frequency") + xlab("N Observations") +
+    ylab("Frequency") + xlab("Number of Observations") +
     theme_bw() +
     geom_hline(yintercept = 0)
   
@@ -48,7 +48,7 @@ plot_meta_data <- function(allplots=T, df = OpenClustered::data_list){
       color = "white",
       fill = "black",boundary = 0) +
     ggtitle("Number of Cluster Units") +
-    ylab("Frequency") + xlab("Clusters") +
+    ylab("Frequency") + xlab("Number of Clusters") +
     theme_bw() +
     geom_hline(yintercept = 0)
   

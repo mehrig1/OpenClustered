@@ -65,18 +65,19 @@ auc_results <- data.frame(
   GLMM_AUC = numeric(),
   GLMM_CI_Lower = numeric(),
   GLMM_CI_Upper = numeric(),
+  GLMM_Time = numeric(),
   BRMS_AUC = numeric(),
   BRMS_CI_Lower = numeric(),
   BRMS_CI_Upper = numeric(),
-  RF_AUC = numeric(),
-  RF_CI_Lower = numeric(),
-  RF_CI_Upper = numeric(),
+  BRMS_Time = numeric(),
+  GLM_AUC = numeric(),
+  GLM_CI_Lower = numeric(),
+  GLM_CI_Upper = numeric(),
+  GLM_Time = numeric(),
   stringsAsFactors = FALSE
 )
 
 for (i in 1:length(data_list)) {
-  
-  names(data_list)
   data_name <- names(data_list[i])
   temp_df <- data_list[[i]]
   
@@ -93,7 +94,6 @@ for (i in 1:length(data_list)) {
   }
   
   # Dummy code factor variables
-  # Convert all variables except 'cluster_id' to dummy variables
   temp_df_numeric <- as.data.frame(model.matrix(~ . - 1, data = temp_df %>% select(-cluster_id)))
   
   # Remove highly correlated predictors
@@ -102,42 +102,42 @@ for (i in 1:length(data_list)) {
   vars_to_drop <- unique(colnames(corr_matrix)[high_corr[, 2]])
   temp_df_numeric <- temp_df_numeric[, !names(temp_df_numeric) %in% vars_to_drop]
   
-  # Add 'cluster_id' back to the dataframe
   temp_df_numeric$cluster_id <- temp_df$cluster_id
-  
-  # Rename target variable
   names(temp_df_numeric)[which(grepl("target", names(temp_df_numeric)))[1]] <- "target"
   
-  # Remove "+" from variable names
-  names(temp_df_numeric) <- gsub("\\+", "", names(temp_df_numeric))
-  names(temp_df_numeric) <- gsub("\\-", "", names(temp_df_numeric))
-  names(temp_df_numeric) <- gsub("\\ ", "", names(temp_df_numeric))
-  names(temp_df_numeric) <- gsub("\\(", "_", names(temp_df_numeric))
-  names(temp_df_numeric) <- gsub("\\,", "_", names(temp_df_numeric))
-  names(temp_df_numeric) <- gsub("\\)", "", names(temp_df_numeric))
-  names(temp_df_numeric) <- gsub("/", "_", names(temp_df_numeric))
+  #fix column names of special characters, replacing with underscore
+  names(temp_df_numeric) <- gsub("[+\\-(),/]", "", names(temp_df_numeric), perl = TRUE)
+  names(temp_df_numeric) <- gsub(" ", "", names(temp_df_numeric), perl = TRUE)
   
-  # Split dataset into training and testing datasets
-  train_ids <- sample(1:nrow(temp_df_numeric), size = round(0.7 * nrow(temp_df_numeric)))
-  train_data <- temp_df_numeric[train_ids, ]
-  test_data <- temp_df_numeric[-train_ids, ]
+  train_data = temp_df_numeric
+  #Split into testing and training and testing
+  # train_ids <- sample(1:nrow(temp_df_numeric), size = round(0.7 * nrow(temp_df_numeric)))
+  # train_data <- temp_df_numeric[train_ids, ]
+  # test_data <- temp_df_numeric[-train_ids, ]
   
   form <- as.formula(paste(
     "target ~", 
-    paste(names(test_data[names(test_data) %in% c("cluster_id", "target") == FALSE]), collapse = "+"), 
+    paste(names(train_data[names(train_data) %in% c("cluster_id", "target") == FALSE]), collapse = "+"), 
     "+ (1 | cluster_id)"
   ))
   
+  form_no_cluster <- as.formula(paste(
+    "target ~", 
+    paste(names(train_data[names(train_data) %in% c("cluster_id", "target") == FALSE]), collapse = "+")
+  ))
+  
   ## Fit GLMM
-  glmm_auc <- glmm_ci_lower <- glmm_ci_upper <- NA
+  glmm_auc <- glmm_ci_lower <- glmm_ci_upper <- glmm_time <- NA
   tryCatch({
-    results$lmm[[i]] <- glmer(
-      form, 
-      data = train_data,
-      family = binomial(link = "logit")
-    )
-    glmm_preds <- predict(results$lmm[[i]], newdata = test_data, type = "response", allow.new.levels = TRUE)
-    glmm_roc <- roc(test_data$target, glmm_preds)
+    glmm_time <- system.time({
+      results$lmm[[i]] <- glmer(
+        form, 
+        data = train_data,
+        family = binomial(link = "logit")
+      )
+    })["elapsed"]
+    glmm_preds <- predict(results$lmm[[i]], newdata = train_data, type = "response", allow.new.levels = TRUE)
+    glmm_roc <- roc(train_data$target, glmm_preds)
     glmm_auc <- auc(glmm_roc)
     glmm_ci <- ci.auc(glmm_roc)
     glmm_ci_lower <- glmm_ci[1]
@@ -148,39 +148,22 @@ for (i in 1:length(data_list)) {
   })
   
   ## Fit Bayesian Model
-  brms_auc <- brms_auc <- brms_ci_lower <- brms_ci_upper <- NA
+  brms_auc <- brms_ci_lower <- brms_ci_upper <- brms_time <- NA
   tryCatch({
-    iter <- 3000
-    adapt_delta <- 0.96
-    max_attempts <- 3
-    attempt <- 0
-    
-    repeat {
-      attempt <- attempt + 1
-      
+    brms_time <- system.time({
       results$blmm[[i]] <- brm(
         form,
         data = train_data,
         family = bernoulli(),
         chains = 4, 
         cores = 4,
-        iter = iter,
-        control = list(adapt_delta = adapt_delta)
+        iter = 3000,
+        control = list(adapt_delta = 0.96)
       )
-      
-      rhat_values <- summary(results$blmm[[i]])$fixed$Rhat
-      
-      if (all(rhat_values <= 1.2, na.rm = TRUE) || attempt >= max_attempts) {
-        break
-      } else {
-        iter <- iter * 2
-        adapt_delta <- adapt_delta + 0.01
-      }
-    }
-    
-    blmm_preds <- posterior_epred(results$blmm[[i]], newdata = test_data, allow_new_levels = TRUE)
+    })["elapsed"]
+    blmm_preds <- posterior_epred(results$blmm[[i]], newdata = train_data, allow_new_levels = TRUE)
     blmm_mean_preds <- colMeans(blmm_preds)
-    blmm_roc <- roc(test_data$target, blmm_mean_preds)
+    blmm_roc <- roc(train_data$target, blmm_mean_preds)
     brms_auc <- auc(blmm_roc)
     brms_ci <- ci.auc(blmm_roc)
     brms_ci_lower <- brms_ci[1]
@@ -190,19 +173,25 @@ for (i in 1:length(data_list)) {
     results$blmm[[i]] <- NULL
   })
   
-  ## Fit Random Forest Model (with ntree = 2000)
-  rf_auc <- rf_ci_lower <- rf_ci_upper <- NA
+  ## Fit GLM
+  glm_auc <- glm_ci_lower <- glm_ci_upper <- glm_time <- NA
   tryCatch({
-    rf_model <- randomForest(form, data = train_data, importance = TRUE, ntree = 2000)
-    rf_preds <- predict(rf_model, newdata = test_data, type = "response")
-    rf_roc <- roc(test_data$target, rf_preds)
-    rf_auc <- auc(rf_roc)
-    rf_ci <- ci.auc(rf_roc)
-    rf_ci_lower <- rf_ci[1]
-    rf_ci_upper <- rf_ci[3]
+    glm_time <- system.time({
+      results$glm[[i]] <- glm(
+        form_no_cluster, 
+        data = train_data,
+        family = binomial(link = "logit")
+      )
+    })["elapsed"]
+    glm_preds <- predict(results$glm[[i]], newdata = train_data, type = "response")
+    glm_roc <- roc(train_data$target, glm_preds)
+    glm_auc <- auc(glm_roc)
+    glm_ci <- ci.auc(glm_roc)
+    glm_ci_lower <- glm_ci[1]
+    glm_ci_upper <- glm_ci[3]
   }, error = function(e) {
-    warning(paste("Error in Random Forest for dataset", data_name, ":", e$message))
-    rf_auc <- rf_ci_lower <- rf_ci_upper <- NA
+    warning(paste("Error in glm for dataset", data_name, ":", e$message))
+    results$glm[[i]] <- NULL
   })
   
   # Append results to the dataframe
@@ -213,12 +202,15 @@ for (i in 1:length(data_list)) {
       GLMM_AUC = glmm_auc,
       GLMM_CI_Lower = glmm_ci_lower,
       GLMM_CI_Upper = glmm_ci_upper,
+      GLMM_Time = glmm_time,
       BRMS_AUC = brms_auc,
       BRMS_CI_Lower = brms_ci_lower,
       BRMS_CI_Upper = brms_ci_upper,
-      RF_AUC = rf_auc,
-      RF_CI_Lower = rf_ci_lower,
-      RF_CI_Upper = rf_ci_upper,
+      BRMS_Time = brms_time,
+      GLM_AUC = glm_auc,
+      GLM_CI_Lower = glm_ci_lower,
+      GLM_CI_Upper = glm_ci_upper,
+      GLM_Time = glm_time,
       stringsAsFactors = FALSE
     )
   )
@@ -227,32 +219,61 @@ for (i in 1:length(data_list)) {
 }
 
 
+
 saveRDS(results, file="results.rds")
 saveRDS(auc_results, file="auc_results.rds")
-results
 auc_results
 
+summary_stats <- auc_results %>%
+  summarize(
+    # GLMM
+    GLMM_Mean_AUC = mean(GLMM_AUC, na.rm = TRUE),
+    GLMM_SD_AUC = sd(GLMM_AUC, na.rm = TRUE),
+    GLMM_Mean_Time = mean(GLMM_Time, na.rm = TRUE),
+    GLMM_SD_Time = sd(GLMM_Time, na.rm = TRUE),
+    
+    # BRMS
+    BRMS_Mean_AUC = mean(BRMS_AUC, na.rm = TRUE),
+    BRMS_SD_AUC = sd(BRMS_AUC, na.rm = TRUE),
+    BRMS_Mean_Time = mean(BRMS_Time, na.rm = TRUE),
+    BRMS_SD_Time = sd(BRMS_Time, na.rm = TRUE),
+    
+    # GLM
+    GLM_Mean_AUC = mean(GLM_AUC, na.rm = TRUE),
+    GLM_SD_AUC = sd(GLM_AUC, na.rm = TRUE),
+    GLM_Mean_Time = mean(GLM_Time, na.rm = TRUE),
+    GLM_SD_Time = sd(GLM_Time, na.rm = TRUE)
+  )
 
+summary_stats
 
 # Load necessary libraries
 library(ggplot2)
 library(tidyr)
 library(dplyr)
 
-# Reshape data to long format
 df_long <- auc_results %>% 
   mutate(
     GLMM_AUC = as.numeric(GLMM_AUC),
-    BRMS_AUC = as.numeric(BRMS_AUC)
+    BRMS_AUC = as.numeric(BRMS_AUC),
+    GLM_AUC = as.numeric(GLM_AUC)
   ) %>%
   pivot_longer(
-    cols = c(GLMM_AUC, BRMS_AUC),
+    cols = c(GLMM_AUC, BRMS_AUC, GLM_AUC),
     names_to = "Model",
     values_to = "AUC"
   ) %>%
   mutate(
-    CI_Lower = ifelse(Model == "GLMM_AUC", GLMM_CI_Lower, BRMS_CI_Lower),
-    CI_Upper = ifelse(Model == "GLMM_AUC", GLMM_CI_Upper, BRMS_CI_Upper),
+    CI_Lower = case_when(
+      Model == "GLMM_AUC" ~ GLMM_CI_Lower,
+      Model == "BRMS_AUC" ~ BRMS_CI_Lower,
+      Model == "GLM_AUC" ~ GLM_CI_Lower
+    ),
+    CI_Upper = case_when(
+      Model == "GLMM_AUC" ~ GLMM_CI_Upper,
+      Model == "BRMS_AUC" ~ BRMS_CI_Upper,
+      Model == "GLM_AUC" ~ GLM_CI_Upper
+    ),
     Model = gsub("_AUC", "", Model) # Clean model names
   )
 
@@ -267,4 +288,4 @@ ggplot(df_long, aes(x = AUC, y = Dataset, color = Model)) +
     y = "Dataset",
     color = "Model"
   ) +
-  theme_minimal() + coord_flip()
+  theme_minimal() 
