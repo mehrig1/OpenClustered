@@ -224,36 +224,14 @@ saveRDS(results, file="results.rds")
 saveRDS(auc_results, file="auc_results.rds")
 auc_results
 
-summary_stats <- auc_results %>%
-  summarize(
-    # GLMM
-    GLMM_Mean_AUC = mean(GLMM_AUC, na.rm = TRUE),
-    GLMM_SD_AUC = sd(GLMM_AUC, na.rm = TRUE),
-    GLMM_Mean_Time = mean(GLMM_Time, na.rm = TRUE),
-    GLMM_SD_Time = sd(GLMM_Time, na.rm = TRUE),
-    
-    # BRMS
-    BRMS_Mean_AUC = mean(BRMS_AUC, na.rm = TRUE),
-    BRMS_SD_AUC = sd(BRMS_AUC, na.rm = TRUE),
-    BRMS_Mean_Time = mean(BRMS_Time, na.rm = TRUE),
-    BRMS_SD_Time = sd(BRMS_Time, na.rm = TRUE),
-    
-    # GLM
-    GLM_Mean_AUC = mean(GLM_AUC, na.rm = TRUE),
-    GLM_SD_AUC = sd(GLM_AUC, na.rm = TRUE),
-    GLM_Mean_Time = mean(GLM_Time, na.rm = TRUE),
-    GLM_SD_Time = sd(GLM_Time, na.rm = TRUE)
-  )
-
-summary_stats
 
 # Load necessary libraries
 library(ggplot2)
 library(tidyr)
 library(dplyr)
 
-unique(df_long$Dataset)
 
+#Convert to long for plotting purposes
 df_long <- auc_results %>% 
   mutate(
     GLMM_AUC = as.numeric(GLMM_AUC),
@@ -279,12 +257,18 @@ df_long <- auc_results %>%
     Model = gsub("_AUC", "", Model) # Clean model names
   )
 
+#order datasets
+df_long$Dataset <- factor(df_long$Dataset, levels = (unique(df_long$Dataset[order(as.numeric(sub("dat", "", df_long$Dataset)))])))
 
-df_long$Dataset <- factor(df_long$Dataset, levels = rev(unique(df_long$Dataset[order(as.numeric(sub("dat", "", df_long$Dataset)))])))
+# Modify the factor levels for the Model variable
+df_long$Model <- factor(df_long$Model, 
+                        levels = c("BRMS", "GLMM", "GLM"), 
+                        labels = c("Bayes-GLMM", "Freq-GLMM", "Freq-GLM"))
 
-
-# Plot
-ggplot(df_long, aes(x = AUC, y = Dataset, color = Model)) +
+# Assuming df_long is your data frame
+ggplot(df_long, aes(x = AUC, y = reorder(Dataset, as.numeric(Dataset)), color = Model)) +
+  geom_rect(aes(xmin = -Inf, xmax = Inf, ymin = as.numeric(Dataset) - 0.5, ymax = as.numeric(Dataset) + 0.5),
+            fill = "grey95", col = "grey", alpha = 0.5) +  # Light grey background for each group with grey bounding lines
   geom_point(position = position_dodge(width = .6), size = 3) +
   geom_errorbarh(aes(xmin = CI_Lower, xmax = CI_Upper),
                  position = position_dodge(width = .6), height = 0.2) +
@@ -294,4 +278,13 @@ ggplot(df_long, aes(x = AUC, y = Dataset, color = Model)) +
     y = "Dataset",
     color = "Model"
   ) +
-  theme_minimal() + coord_flip()
+  theme_minimal() + 
+  coord_flip() +
+  theme(strip.background = element_blank(),  # Remove background for facet labels
+        strip.text = element_text(face = "bold", size = 12),  # Bold facet labels
+        panel.grid.major.y = element_blank(),  # Remove default y-axis grid lines
+        panel.grid.minor.y = element_blank(),
+        panel.border = element_blank(),  # Remove panel border
+        axis.line.y = element_line(color = "grey90"),  # Change y-axis line color to grey
+        axis.ticks.y = element_line(color = "grey90"))  # Change y-axis ticks color to grey
+

@@ -48,18 +48,18 @@ plot_meta_data(allplots=T)
 
 ### Tabulate Meta Data
 
-We can further tabulate meta data summary statistics via the function 'tab_meta_data'. At it's core, this function is simply a wrapper for the 'table1::table1" function, but further allows for simple specification of a subset of datasets from data_list for summarization (to be shown in an upcoming section). By defualt, this function summarizes all datasets from "data_list", with the primary parameter 'formula' being a formula specification following the notation, '~ x + y + z`, where x, y, and z are variables to summarize.
+We can further tabulate meta data summary statistics via the function 'tab_meta_data'. At it's core, this function is simply a wrapper for the 'table1::table1" function, but further allows for simple specification of a subset of datasets from data_list for summarization (to be shown in an upcoming section). By default, this function summarizes all datasets from "data_list", with the primary parameter 'formula' being a formula specification following the notation, '~ x + y + z`, where x, y, and z are variables to summarize.
 
 
 ```{r tab_meta, message=F}
 # Summarize Meta Data (using r package "table1")
-tab_meta_data(formula = ~n_obs + n_features + n_clusters + imbalance + missing_obs + 
-                domain + sim_or_real)
+tab_meta_data(~n_obs +  n_features + n_clusters + imbalance + missing_percent)
+
 ```
 
 ## Subsetting data_list 
 
-We provide wrapper functons for easily subsetting the 'data_list' based on meta data criteria through the function 'filter_data()'. The primary inputs follow 'dplyr::filter()' syntax. The 'subset' parameter is logical. If "TRUE", it returns a list containing each dataset meeting the specified criteria as an element of that list. If "FALSE", the function returns a vector of the dataset names matching the filtered criteria. 
+We provide wrapper functions for easily subsetting the 'data_list' based on meta data criteria through the function 'filter_data()'. The primary inputs follow 'dplyr::filter()' syntax. The 'subset' parameter is logical. If "TRUE", it returns a list containing each dataset meeting the specified criteria as an element of that list. If "FALSE", the function returns a vector of the dataset names matching the filtered criteria. 
 
 Here's an example of us subsetting our 'data_list' to only those with >= 1000 observations within the domain "linguistics":
 
@@ -82,9 +82,8 @@ plot_meta_data(allplots=T, df = ling_data)
 Similarly, we can tabulate these chacarteristics in the "tab_meta_data()" functuon through the 'df' parameter in the same way: 
 
 ```{r filter_plots}
-# Summarize the list of linguistic datasets with >=1000 observations
-tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs + 
-                domain + sim_or_real, df= ling_data)
+tab_meta_data(~n_obs +  n_features + n_clusters + imbalance + missing_percent,
+              df= ling_data)
 ```
 
 # Example 
