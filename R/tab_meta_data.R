@@ -8,6 +8,7 @@
 #' plot_meta_data(allplots=T)
 #' @export
 #' 
+#' 
 
 tab_meta_data <- function(formula, df = data_list) {
   #get names of the data_list to be summarize 
@@ -16,6 +17,13 @@ tab_meta_data <- function(formula, df = data_list) {
   # Subset data to summarize to those included
   meta_data <- OpenClustered::meta_data
   meta_data <- meta_data[meta_data$dataset %in% df_names, ]
+  
+  #Label meta data
+  label(meta_data$n_obs) = "Number of Observations"
+  label(meta_data$n_features) = "Number of Features"
+  label(meta_data$n_clusters) = "Number of Clusters"
+  label(meta_data$imbalance) = "Imbalance"
+  label(meta_data$missing_obs) = "Number of Missing Observations"
   
   # Generate the table using the provided formula
   table1::table1(data = meta_data, formula)

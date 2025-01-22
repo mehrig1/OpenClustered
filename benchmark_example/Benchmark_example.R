@@ -252,6 +252,8 @@ library(ggplot2)
 library(tidyr)
 library(dplyr)
 
+unique(df_long$Dataset)
+
 df_long <- auc_results %>% 
   mutate(
     GLMM_AUC = as.numeric(GLMM_AUC),
@@ -277,6 +279,10 @@ df_long <- auc_results %>%
     Model = gsub("_AUC", "", Model) # Clean model names
   )
 
+
+df_long$Dataset <- factor(df_long$Dataset, levels = rev(unique(df_long$Dataset[order(as.numeric(sub("dat", "", df_long$Dataset)))])))
+
+
 # Plot
 ggplot(df_long, aes(x = AUC, y = Dataset, color = Model)) +
   geom_point(position = position_dodge(width = .6), size = 3) +
@@ -288,4 +294,4 @@ ggplot(df_long, aes(x = AUC, y = Dataset, color = Model)) +
     y = "Dataset",
     color = "Model"
   ) +
-  theme_minimal() 
+  theme_minimal() + coord_flip()
