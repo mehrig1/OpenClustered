@@ -15,19 +15,19 @@ tab_meta_data <- function(formula, df = data_list) {
   df_names <- names(df)
   
   # Subset data to summarize to those included
-  meta_data <- OpenClustered::meta_data
-  meta_data <- meta_data[meta_data$dataset %in% df_names, ]
+  temp_data <- OpenClustered::meta_data
+  temp_data <- temp_data[temp_data$dataset %in% df_names, ]
   
   #Label meta data
-  Hmisc::label(meta_data$n_obs) = "Number of Observations"
-  Hmisc::label(meta_data$n_features) = "Number of Features"
-  Hmisc::label(meta_data$n_clusters) = "Number of Clusters"
-  Hmisc::label(meta_data$imbalance) = "Imbalance"
-  Hmisc::label(meta_data$missing_obs) = "Number of Missing Observations"
-  Hmisc::label(meta_data$missing_percent) = "Missing Data Percent by Dataset"
+  Hmisc::label(temp_data$n_obs) = "Number of Observations"
+  Hmisc::label(temp_data$n_features) = "Number of Features"
+  Hmisc::label(temp_data$missing_percent) = "Rows with Missing Data"
+  Hmisc::label(temp_data$n_clusters) = "Number of Clusters"
+  Hmisc::label(temp_data$imbalance) = "Imbalance"
+  Hmisc::label(temp_data$missing_obs) = "Number of Missing Observations"
   
   # Generate the table using the provided formula
-  table1::table1(data = meta_data, formula)
+  table1::table1(data = temp_data, formula)
 }
 
 

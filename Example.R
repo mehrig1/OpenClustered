@@ -11,7 +11,44 @@ head(OpenClustered::meta_data)
 plot_meta_data(allplots=T)
 
 # Summarize Meta Data (using r package "table1")
-tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_percent)
+tab_meta_data(~n_obs +  n_features + n_clusters + imbalance + missing_percent)
+
+data_long <- meta_data %>%
+  pivot_longer(cols = everything(), names_to = "Variable", values_to = "Value")
+
+# Calculate summary statistics
+summary_table <- data_long %>%
+  group_by(Variable) %>%
+  summarise(
+    Mean = mean(Value, na.rm = TRUE),
+    SD = sd(Value, na.rm = TRUE),
+    Median = median(Value, na.rm = TRUE),
+    Range = paste0(round(min(Value, na.rm = TRUE), 2), " - ", round(max(Value, na.rm = TRUE), 2))
+  ) %>%
+  ungroup()
+
+# Convert the summary table to a grob
+table_grob <- tableGrob(summary_table, rows = NULL)
+
+# Example 4-panel plot (replace with your actual plot)
+data_plot <- ggplot(data, aes(x = n_obs, y = n_features)) +
+  geom_point() +
+  facet_wrap(~n_clusters) +
+  theme_minimal()
+
+# Convert the ggplot object to a grob (if necessary)
+plot_grob <- ggplotGrob(data_plot)
+
+# Combine the plot and table side by side
+combined <- grid.arrange(plot_grob, table_grob, ncol = 2, widths = c(2, 1))
+
+# Display the combined figure
+print(combined)
+
+
+
+
+
 
 order_datasets <- function(dataset_names) {
   # Extract numeric part after "dat" and order based on that
