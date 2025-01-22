@@ -19,11 +19,12 @@ tab_meta_data <- function(formula, df = data_list) {
   meta_data <- meta_data[meta_data$dataset %in% df_names, ]
   
   #Label meta data
-  label(meta_data$n_obs) = "Number of Observations"
-  label(meta_data$n_features) = "Number of Features"
-  label(meta_data$n_clusters) = "Number of Clusters"
-  label(meta_data$imbalance) = "Imbalance"
-  label(meta_data$missing_obs) = "Number of Missing Observations"
+  Hmisc::label(meta_data$n_obs) = "Number of Observations"
+  Hmisc::label(meta_data$n_features) = "Number of Features"
+  Hmisc::label(meta_data$n_clusters) = "Number of Clusters"
+  Hmisc::label(meta_data$imbalance) = "Imbalance"
+  Hmisc::label(meta_data$missing_obs) = "Number of Missing Observations"
+  Hmisc::label(meta_data$missing_percent) = "Missing Data Percent by Dataset"
   
   # Generate the table using the provided formula
   table1::table1(data = meta_data, formula)

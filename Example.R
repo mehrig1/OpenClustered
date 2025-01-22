@@ -4,9 +4,6 @@ devtools::install_github("https://github.com/NateOConnellPhD/OpenClustered")
 # load package
 library(OpenClustered)
 
-OpenClustered::data_list[[3]]
-test = data_list
-
 # View Meta Data files
 head(OpenClustered::meta_data)
 
@@ -14,7 +11,7 @@ head(OpenClustered::meta_data)
 plot_meta_data(allplots=T)
 
 # Summarize Meta Data (using r package "table1")
-tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs )
+tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_percent)
 
 order_datasets <- function(dataset_names) {
   # Extract numeric part after "dat" and order based on that
