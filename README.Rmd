@@ -33,7 +33,7 @@ We can view info and meta data on the availble datasets within the list 'data_li
 ```{r view_data}
 # View Meta Data files
 # exclude the 6th column 'origin' for cleaner output
-head(OpenClustered::meta_data)[,-6]
+head(OpenClustered::meta_data)[,-7]
 ```
 
 ### Plot Meta Data

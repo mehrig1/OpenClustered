@@ -44,23 +44,30 @@ We can view info and meta data on the availble datasets within the list
 ``` r
 # View Meta Data files
 # exclude the 6th column 'origin' for cleaner output
-head(OpenClustered::meta_data)[,-6]
+head(OpenClustered::meta_data)[,-7]
 ```
 
-    ##   dataset dataset_name   outcome      domain sim_or_real n_obs n_features
-    ## 1    dat1     hospital remission    medicine   simulated  8469         20
-    ## 2   dat10     prenatal      care    medicine        real  2449         12
-    ## 3   dat11       memory       acc   education        real  1602          5
-    ## 4   dat12       dative      Verb linguistics        real  3263         13
-    ## 5   dat13      culcita predation       ocean        real    80          1
-    ## 6   dat14      toenail   outcome    medicine        real  1908          2
-    ##   n_clusters n_classes imbalance           task missing_obs
-    ## 1        381         2      0.30 Classification        8469
-    ## 2        161         2      0.45 Classification        2449
-    ## 3         34         2      0.31 Classification         462
-    ## 4         75         2      0.26 Classification        2360
-    ## 5         10         2      0.38 Classification          80
-    ## 6        294         2      0.21 Classification        1908
+    ##   dataset dataset_name   outcome      domain sim_or_real          cluster_type
+    ## 1    dat1     hospital remission    medicine   simulated          heirarchical
+    ## 2   dat10     prenatal      care    medicine        real          heirarchical
+    ## 3   dat11       memory       acc   education        real               grouped
+    ## 4   dat12       dative      Verb linguistics        real repeated_measurements
+    ## 5   dat13      culcita predation       ocean        real               grouped
+    ## 6   dat14      toenail   outcome    medicine        real          longitudinal
+    ##   n_obs n_features n_clusters n_classes imbalance           task missing_obs
+    ## 1  8469         20        381         2      0.30 Classification        8469
+    ## 2  2449         11        161         2      0.45 Classification        2449
+    ## 3  1602          5         34         2      0.31 Classification         462
+    ## 4  3263         13         75         2      0.26 Classification        2360
+    ## 5    80          1         10         2      0.38 Classification          80
+    ## 6  1908          2        294         2      0.21 Classification        1908
+    ##   missing_percent
+    ## 1       1.0000000
+    ## 2       1.0000000
+    ## 3       0.2883895
+    ## 4       0.7232608
+    ## 5       1.0000000
+    ## 6       1.0000000
 
 ### Plot Meta Data
 
@@ -85,15 +92,14 @@ We can further tabulate meta data summary statistics via the function
 ‘tab_meta_data’. At it’s core, this function is simply a wrapper for the
 ‘table1::table1” function, but further allows for simple specification
 of a subset of datasets from data_list for summarization (to be shown in
-an upcoming section). By defualt, this function summarizes all datasets
+an upcoming section). By default, this function summarizes all datasets
 from “data_list”, with the primary parameter ’formula’ being a formula
 specification following the notation, ’~ x + y + z\`, where x, y, and z
 are variables to summarize.
 
 ``` r
 # Summarize Meta Data (using r package "table1")
-tab_meta_data(formula = ~n_obs + n_features + n_clusters + imbalance + missing_obs + 
-                domain + sim_or_real)
+tab_meta_data(~n_obs +  n_features + n_clusters + imbalance + missing_percent)
 ```
 
 <div class="Rtable1"><table class="Rtable1">
@@ -105,7 +111,7 @@ tab_meta_data(formula = ~n_obs + n_features + n_clusters + imbalance + missing_o
 </thead>
 <tbody>
 <tr>
-<td class='rowlabel firstrow'>n_obs</td>
+<td class='rowlabel firstrow'>Number of Observations</td>
 <td class='firstrow'></td>
 </tr>
 <tr>
@@ -117,19 +123,19 @@ tab_meta_data(formula = ~n_obs + n_features + n_clusters + imbalance + missing_o
 <td class='lastrow'>1910 [80.0, 8470]</td>
 </tr>
 <tr>
-<td class='rowlabel firstrow'>n_features</td>
+<td class='rowlabel firstrow'>Number of Features</td>
 <td class='firstrow'></td>
 </tr>
 <tr>
 <td class='rowlabel'>Mean (SD)</td>
-<td>6.11 (5.08)</td>
+<td>5.84 (4.92)</td>
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Median [Min, Max]</td>
 <td class='lastrow'>4.00 [1.00, 20.0]</td>
 </tr>
 <tr>
-<td class='rowlabel firstrow'>n_clusters</td>
+<td class='rowlabel firstrow'>Number of Clusters</td>
 <td class='firstrow'></td>
 </tr>
 <tr>
@@ -141,7 +147,7 @@ tab_meta_data(formula = ~n_obs + n_features + n_clusters + imbalance + missing_o
 <td class='lastrow'>60.0 [10.0, 537]</td>
 </tr>
 <tr>
-<td class='rowlabel firstrow'>imbalance</td>
+<td class='rowlabel firstrow'>Imbalance</td>
 <td class='firstrow'></td>
 </tr>
 <tr>
@@ -153,60 +159,16 @@ tab_meta_data(formula = ~n_obs + n_features + n_clusters + imbalance + missing_o
 <td class='lastrow'>0.330 [0.120, 0.480]</td>
 </tr>
 <tr>
-<td class='rowlabel firstrow'>missing_obs</td>
+<td class='rowlabel firstrow'>Rows with Missing Data</td>
 <td class='firstrow'></td>
 </tr>
 <tr>
 <td class='rowlabel'>Mean (SD)</td>
-<td>1940 (2130)</td>
+<td>0.934 (0.173)</td>
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Median [Min, Max]</td>
-<td class='lastrow'>1910 [80.0, 8470]</td>
-</tr>
-<tr>
-<td class='rowlabel firstrow'>domain</td>
-<td class='firstrow'></td>
-</tr>
-<tr>
-<td class='rowlabel'>animal</td>
-<td>2 (10.5%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>education</td>
-<td>1 (5.3%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>linguistics</td>
-<td>6 (31.6%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>medicine</td>
-<td>6 (31.6%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>ocean</td>
-<td>1 (5.3%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>politics</td>
-<td>1 (5.3%)</td>
-</tr>
-<tr>
-<td class='rowlabel lastrow'>Missing</td>
-<td class='lastrow'>2 (10.5%)</td>
-</tr>
-<tr>
-<td class='rowlabel firstrow'>sim_or_real</td>
-<td class='firstrow'></td>
-</tr>
-<tr>
-<td class='rowlabel'>real</td>
-<td>16 (84.2%)</td>
-</tr>
-<tr>
-<td class='rowlabel lastrow'>simulated</td>
-<td class='lastrow'>3 (15.8%)</td>
+<td class='lastrow'>1.00 [0.288, 1.00]</td>
 </tr>
 </tbody>
 </table>
@@ -214,7 +176,7 @@ tab_meta_data(formula = ~n_obs + n_features + n_clusters + imbalance + missing_o
 
 ## Subsetting data_list
 
-We provide wrapper functons for easily subsetting the ‘data_list’ based
+We provide wrapper functions for easily subsetting the ‘data_list’ based
 on meta data criteria through the function ‘filter_data()’. The primary
 inputs follow ‘dplyr::filter()’ syntax. The ‘subset’ parameter is
 logical. If “TRUE”, it returns a list containing each dataset meeting
@@ -251,9 +213,8 @@ Similarly, we can tabulate these chacarteristics in the
 “tab_meta_data()” functuon through the ‘df’ parameter in the same way:
 
 ``` r
-# Summarize the list of linguistic datasets with >=1000 observations
-tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs + 
-                domain + sim_or_real, df= ling_data)
+tab_meta_data(~n_obs +  n_features + n_clusters + imbalance + missing_percent,
+              df= ling_data)
 ```
 
 <div class="Rtable1"><table class="Rtable1">
@@ -265,7 +226,7 @@ tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs +
 </thead>
 <tbody>
 <tr>
-<td class='rowlabel firstrow'>n_obs</td>
+<td class='rowlabel firstrow'>Number of Observations</td>
 <td class='firstrow'></td>
 </tr>
 <tr>
@@ -277,7 +238,7 @@ tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs +
 <td class='lastrow'>2000 [1110, 3260]</td>
 </tr>
 <tr>
-<td class='rowlabel firstrow'>n_features</td>
+<td class='rowlabel firstrow'>Number of Features</td>
 <td class='firstrow'></td>
 </tr>
 <tr>
@@ -289,7 +250,7 @@ tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs +
 <td class='lastrow'>4.00 [4.00, 13.0]</td>
 </tr>
 <tr>
-<td class='rowlabel firstrow'>n_clusters</td>
+<td class='rowlabel firstrow'>Number of Clusters</td>
 <td class='firstrow'></td>
 </tr>
 <tr>
@@ -301,7 +262,7 @@ tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs +
 <td class='lastrow'>75.0 [71.0, 208]</td>
 </tr>
 <tr>
-<td class='rowlabel firstrow'>imbalance</td>
+<td class='rowlabel firstrow'>Imbalance</td>
 <td class='firstrow'></td>
 </tr>
 <tr>
@@ -313,32 +274,16 @@ tab_meta_data(~n_obs + n_features + n_clusters + imbalance + missing_obs +
 <td class='lastrow'>0.260 [0.170, 0.430]</td>
 </tr>
 <tr>
-<td class='rowlabel firstrow'>missing_obs</td>
+<td class='rowlabel firstrow'>Rows with Missing Data</td>
 <td class='firstrow'></td>
 </tr>
 <tr>
 <td class='rowlabel'>Mean (SD)</td>
-<td>1820 (642)</td>
+<td>0.908 (0.160)</td>
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Median [Min, Max]</td>
-<td class='lastrow'>2000 [1110, 2360]</td>
-</tr>
-<tr>
-<td class='rowlabel firstrow'>domain</td>
-<td class='firstrow'></td>
-</tr>
-<tr>
-<td class='rowlabel lastrow'>linguistics</td>
-<td class='lastrow'>3 (100%)</td>
-</tr>
-<tr>
-<td class='rowlabel firstrow'>sim_or_real</td>
-<td class='firstrow'></td>
-</tr>
-<tr>
-<td class='rowlabel lastrow'>real</td>
-<td class='lastrow'>3 (100%)</td>
+<td class='lastrow'>1.00 [0.723, 1.00]</td>
 </tr>
 </tbody>
 </table>
