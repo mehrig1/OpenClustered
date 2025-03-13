@@ -10,9 +10,12 @@ head(OpenClustered::meta_data)
 # View meta data characteristics of all datasets in `data_list`
 plot_meta_data(allplots=T)
 
+meta_data$dataset <- factor(meta_data$dataset, levels = (unique(meta_data$dataset[order(as.numeric(sub("dat", "", meta_data$dataset)))])))
+meta_data = meta_data %>% arrange(dataset)
+meta_data[,1:6] %>% kableExtra::kbl() %>% kableExtra::kable_styling()
+
 # Summarize Meta Data (using r package "table1")
 tab_meta_data(~n_obs +  n_features + n_clusters + imbalance + missing_percent)
-
 
 order_datasets <- function(dataset_names) {
   # Extract numeric part after "dat" and order based on that
