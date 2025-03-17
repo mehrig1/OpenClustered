@@ -55,19 +55,19 @@ head(OpenClustered::meta_data)[,-7]
     ## 5   dat13      culcita predation       ocean        real               grouped
     ## 6   dat14      toenail   outcome    medicine        real          longitudinal
     ##   n_obs n_features n_clusters n_classes imbalance           task missing_obs
-    ## 1  8469         20        381         2      0.30 Classification        8469
-    ## 2  2449         11        161         2      0.45 Classification        2449
-    ## 3  1602          5         34         2      0.31 Classification         462
-    ## 4  3263         13         75         2      0.26 Classification        2360
-    ## 5    80          1         10         2      0.38 Classification          80
-    ## 6  1908          2        294         2      0.21 Classification        1908
+    ## 1  8469         20        381         2      0.30 Classification           0
+    ## 2  2449         11        161         2      0.45 Classification           0
+    ## 3  1602          5         34         2      0.31 Classification        1140
+    ## 4  3263         13         75         2      0.26 Classification         903
+    ## 5    80          1         10         2      0.38 Classification           0
+    ## 6  1908          2        294         2      0.21 Classification           0
     ##   missing_percent
-    ## 1       1.0000000
-    ## 2       1.0000000
-    ## 3       0.2883895
-    ## 4       0.7232608
-    ## 5       1.0000000
-    ## 6       1.0000000
+    ## 1       0.0000000
+    ## 2       0.0000000
+    ## 3       0.7116105
+    ## 4       0.2767392
+    ## 5       0.0000000
+    ## 6       0.0000000
 
 ### Plot Meta Data
 
@@ -164,11 +164,11 @@ tab_meta_data(~n_obs +  n_features + n_clusters + imbalance + missing_percent)
 </tr>
 <tr>
 <td class='rowlabel'>Mean (SD)</td>
-<td>0.934 (0.173)</td>
+<td>0.0662 (0.173)</td>
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Median [Min, Max]</td>
-<td class='lastrow'>1.00 [0.288, 1.00]</td>
+<td class='lastrow'>0 [0, 0.712]</td>
 </tr>
 </tbody>
 </table>
@@ -279,11 +279,11 @@ tab_meta_data(~n_obs +  n_features + n_clusters + imbalance + missing_percent,
 </tr>
 <tr>
 <td class='rowlabel'>Mean (SD)</td>
-<td>0.908 (0.160)</td>
+<td>0.0922 (0.160)</td>
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Median [Min, Max]</td>
-<td class='lastrow'>1.00 [0.723, 1.00]</td>
+<td class='lastrow'>0 [0, 0.277]</td>
 </tr>
 </tbody>
 </table>
