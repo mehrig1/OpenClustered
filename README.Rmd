@@ -8,6 +8,8 @@ always_allow_html: true
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+The following was published in BMC Medical Research Methodology. Here is the citation: O’Connell, N.S., Speiser, J.L. OpenClustered: an R package with a benchmark suite of clustered datasets for methodological evaluation and comparison. BMC Med Res Methodol 25, 92 (2025). https://doi.org/10.1186/s12874-025-02548-8
+
 OpenClustered is an R package data repository for clustered and longitudinal datasets. The goal of this package is to coalesce clustered datasets in harmonized fashioned for developing, testing, and benchmarking existing and new methods for clustered data analysis and prediction. Currently, there are 19 datasets in this repository loaded in with the list "data_list". Each dataset has a unique set of predictor variables/features, with the outcome commonly renamed to "target" and the cluster variable to "cluster_id". The dataset "meta_data" contains information on each of these data sets. Current functionality of this package is basic - limited to reading in, summarizing, and subsetting datasets based on user defined filtering criteria. The development of this R package is ongoing, as we will continue to add more clustered data sets they become available and can be harmonized. We will continue to add more functionality to this package based on user feedback/requests. 
 
 **If you have a clustered dataset without protected information that you can make publicly available, please reach out and we would be happy to incorporate it into this package**

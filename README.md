@@ -1,6 +1,12 @@
 OpenClustered
 ================
 
+The following was published in BMC Medical Research Methodology. Here is
+the citation: O’Connell, N.S., Speiser, J.L. OpenClustered: an R package
+with a benchmark suite of clustered datasets for methodological
+evaluation and comparison. BMC Med Res Methodol 25, 92 (2025).
+<https://doi.org/10.1186/s12874-025-02548-8>
+
 OpenClustered is an R package data repository for clustered and
 longitudinal datasets. The goal of this package is to coalesce clustered
 datasets in harmonized fashioned for developing, testing, and
