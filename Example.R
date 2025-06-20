@@ -51,6 +51,7 @@ table1::table1(~Modality + SemanticClass + LengthOfRecipient +
 train_ids <- sample(1:nrow(ling_data$dat12), size = round(.7 * nrow(ling_data$dat12)))
 train_data <- ling_data$dat12[train_ids, ]  # Training set
 test_data <- ling_data$dat12[-train_ids, ]  # Testing set
+train_data$target
 
 #Fit Mixed Model
 fit = glmer(target == "PP" ~ Modality + SemanticClass + LengthOfRecipient + 
