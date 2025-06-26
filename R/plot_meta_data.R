@@ -9,7 +9,10 @@
 #' @export
 #' 
 plot_meta_data <- function(allplots=T, df = OpenClustered::data_list){
-
+  
+  df = data_list
+  
+  
   #get datasets to summarize
   df_names = names(df)
   
@@ -52,6 +55,9 @@ plot_meta_data <- function(allplots=T, df = OpenClustered::data_list){
     theme_bw() +
     geom_hline(yintercept = 0)
   
+  
+  df$imbalance = as.numeric(df$imbalance)
+  
   #Imbalance Plot
   p4 <- ggplot(df, (aes(x = imbalance))) +
     geom_histogram(
@@ -64,8 +70,14 @@ plot_meta_data <- function(allplots=T, df = OpenClustered::data_list){
     geom_hline(yintercept = 0) +
     scale_y_continuous(breaks=c(1,2))
   
+  # *** Add in histograms that summarize the mean, SD, and coefficient of variation for continuous outcomes. 
+  # *** Add in plot of missing data
+ 
+  
   if(allplots==T){
     #Create combined plot
+    # *** Edit this to accommodate new plots once created; 4x2 grid of plots
+    
     grid.arrange(p1, p2, p3, p4,
                  layout_matrix = matrix(c(1, 2, 3, 4),
                                         ncol = 2,
